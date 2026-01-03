@@ -11,6 +11,7 @@ import helpers as h
 DATA_TYPE = [('name', 'U16'), ('height', 'f4'), ('class', 'i4')]
 ITERATIONS_FAST = 10000
 ITERATIONS_SLOW = 100
+
 #####################################################################
 #   Write a numpy program to create a structured array from         #
 #   given student name, height, class and their data types.         #
@@ -24,13 +25,10 @@ def student_array(student_data):
     :param student_data: list of tuples containing student data
     '''
     students = np.array(student_data, dtype=DATA_TYPE)
-
     print("Original Array:")
     print(students)
-
     
     sorted_students = np.sort(students, order='height')
-
     print("\nSorted Array (by height):")
     print(sorted_students)
 
@@ -49,13 +47,14 @@ def solve_equations():
         through Gaussian elimination.
         Vectors for the linear system of equations are required to be
         created through numpy arrays.
+        Choice is given to solve the default system of equations
+        or provide a system of 4 equations.
         Then print the solutions.
     '''
+    my_switch = input("Would you like to execute the " + 
+        "default linear system of equations?(y/n)")
     
-    my_switch = input("Would you like to execute the \
-        default linear system of equations?(y/n)")
-    
-    if my_switch == 'y' or my_switch == 'Y':
+    if my_switch == "y" or my_switch == "Y":
         coefficients = np.array([
             [1, 2, -3, 2],
             [2, -5, 4, 9],
@@ -65,49 +64,47 @@ def solve_equations():
         
         constants = np.array([30, 4, -6, 5])
     
-    if my_switch == 'n' or my_switch == 'N':
+    elif my_switch == "n" or my_switch == "N":
         print("Input required for the linear system of equations")
-        print("Please enter a comma separated list of numbers\
-            representing the coefficients for the variables x,y,z,w,constant")
-        raw_1 = input("Please enter the first equation")
-        raw_2 = input("Please enter the second equation")
-        raw_3 = input("Please enter the third equation")
-        raw_4 = input("Please enter the fourth equation")
+        print("Please enter a comma separated list of numbers " +
+            "representing the coefficients for the variables x,y,z,w,constant")
+        raw_1 = input("Please enter the first equation: ")
+        raw_2 = input("Please enter the second equation: ")
+        raw_3 = input("Please enter the third equation: ")
+        raw_4 = input("Please enter the fourth equation: ")
         
-        string_1 = raw_1.replace(" ", "")
-        string_2 = raw_2.replace(" ", "")
-        string_3 = raw_3.replace(" ", "")
-        string_4 = raw_4.replace(" ", "")
+        list_1 = raw_1.replace(" ", "").split(",")
+        list_2 = raw_2.replace(" ", "").split(",")
+        list_3 = raw_3.replace(" ", "").split(",")
+        list_4 = raw_4.replace(" ", "").split(",")
         
-        list_1 = string_1.split(",")
-        list_2 = string_2.split(",")
-        list_3 = string_3.split(",")
-        list_4 = string_4.split(",")
-        
+        constants_list = [float(list_1.pop()),
+                        float(list_2.pop()),
+                        float(list_3.pop()),
+                        float(list_4.pop())]
+
         coefficients_list = [list(map(float, list_1)),
                             list(map(float, list_2)),  
                             list(map(float, list_3)),
                             list(map(float, list_4))]
         
-        constants_list = [list_1.pop(), list_2.pop, list_3.pop(), list_4.pop()]
         coefficients = np.array(coefficients_list)
-        constants = np.array(constants_list)
-        
-
+        constants = np.array(constants_list)    
     
     else:
         print("Invalid input")
         exit(-1)
     
     solutions = sp.linalg.solve(coefficients, constants)
-    print("Solutions:")
-    print("x ≈ ", solutions.item(0))
-    print("y ≈ ", solutions.item(1))
-    print("z ≈ ", solutions.item(2))
-    print("w ≈ ", solutions.item(3))
+    print("\nSolutions:")
+    print(f"x ≈ {solutions.item(0):.2f}")
+    print(f"y ≈ {solutions.item(1):.2f}")
+    print(f"z ≈ {solutions.item(2):.2f}")
+    print(f"w ≈ {solutions.item(3):.2f}")
 
 ####################################################################
-#   Implement the numpy vectorized version of the L2 loss function.#
+#   Implement the numpy vectorized version of the                  #
+#   L2 loss function using np.dot function                           #
 ####################################################################
 def l2(yhat, y):
     ''' (vector, vector) -> float
@@ -116,17 +113,16 @@ def l2(yhat, y):
     :param y: vector of size m (true labels)
     :return: value of the l2 loss function defined above
     '''
-    
-    
-    loss = None
-    
+    # l2 loss function is the square of differences between predicted and true
+    loss = np.dot(yhat - y, yhat - y)
     return loss
 
 ####################################################################
 #   Compare the performance of the dot product                     #
 #   using parallelism in python                                    #
 #   versus numpy_dot_product                                       #
-#   versus using a for loop and measure the time needed for each.  #
+#   versus using a for loop and measure the time needed            #
+#   for each computational method                                  #
 ####################################################################
 def compare_dot_product_performance():
     ''' (None) -> None
@@ -135,16 +131,15 @@ def compare_dot_product_performance():
     versus a numpy library method 
     versus multithreading in python.
     Takes size of the vectors as input.
-    Prints the time measured for each.
-    '''
-    
+    Creates lists of input size containing random integers
+    from 1 to 1000 then runs the dot product functions.
+    Prints the time measured for each computational method.
+    '''  
     size = int(input("Please enter a natural number for the size of the vectors:"))
     list1 = [random.randint(1, 1000) for _ in range(size)]
     list2 = [random.randint(1, 1000) for _ in range(size)]
-
     array1 = np.array(list1)
     array2 = np.array(list2)
-    
     
     # Measure Parallelized for loop
     start = time.time()
@@ -163,7 +158,6 @@ def compare_dot_product_performance():
     for _ in range(ITERATIONS_FAST):
         h.dot_product_numpy(array1, array2)
     avg_numpy = (time.time() - start) / ITERATIONS_FAST
-
 
     print(f"\nResults for vector size {size}:")
     print(f"Parallel Dot Time:     {avg_parallel:.8f} seconds")
@@ -188,7 +182,10 @@ if __name__ == '__main__':
             solve_equations()
             
         case "3":
-            l2()
+            yhat = np.array([.9, 0.2, 0.1, .4, .9])
+            y = np.array([1, 0, 0, 1, 1])
+            l2_loss = l2(yhat, y)
+            print("L2 = " + str(l2_loss))
         
         case "4":
             compare_dot_product_performance()

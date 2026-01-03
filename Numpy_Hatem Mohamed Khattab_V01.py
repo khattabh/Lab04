@@ -1,10 +1,16 @@
 # Mathematics I Lab 04 Numpy tasks
 # Hatem Mohamed Khattab
 
+import time
 import numpy as np
 import scipy as sp
+import random
+from concurrent.futures import ThreadPoolExecutor
+import helpers as h
 
 DATA_TYPE = [('name', 'U16'), ('height', 'f4'), ('class', 'i4')]
+ITERATIONS_FAST = 10000
+ITERATIONS_SLOW = 100
 #####################################################################
 #   Write a numpy program to create a structured array from         #
 #   given student name, height, class and their data types.         #
@@ -15,7 +21,7 @@ def student_array(student_data):
     Create a numpy array from the input list of tuples, student_data,
     given the data types, DATA_TYPE. Print the original array and
     then sort the array on height and print the sorted array.
-
+    :param student_data: list of tuples containing student data
     '''
     students = np.array(student_data, dtype=DATA_TYPE)
 
@@ -105,8 +111,7 @@ def solve_equations():
 ####################################################################
 def l2(yhat, y):
     ''' (vector, vector) -> float
-    Docstring for l2
-    
+    Takes two vectors and returns the l2 loss value.
     :param yhat: vector of size m (predicted labels)
     :param y: vector of size m (true labels)
     :return: value of the l2 loss function defined above
@@ -117,20 +122,56 @@ def l2(yhat, y):
     
     return loss
 
-'''
-    Compare the performance of the dot product using parallelism in python
-    versus numpy_dot_product versus using a for loop and measure the time
-    needed for each.
-'''
+####################################################################
+#   Compare the performance of the dot product                     #
+#   using parallelism in python                                    #
+#   versus numpy_dot_product                                       #
+#   versus using a for loop and measure the time needed for each.  #
+####################################################################
 def compare_dot_product_performance():
+    ''' (None) -> None
+    Compares the processing time of the dot product 
+    using a traditional for loop
+    versus a numpy library method 
+    versus multithreading in python.
+    Takes size of the vectors as input.
+    Prints the time measured for each.
     '''
+    
+    size = int(input("Please enter a natural number for the size of the vectors:"))
+    list1 = [random.randint(1, 1000) for _ in range(size)]
+    list2 = [random.randint(1, 1000) for _ in range(size)]
 
-    '''
-    return 0
+    array1 = np.array(list1)
+    array2 = np.array(list2)
+    
+    
+    # Measure Parallelized for loop
+    start = time.time()
+    for _ in range(ITERATIONS_SLOW):
+        h.dot_product_parallel(list1, list2)
+    avg_parallel = (time.time() - start) / ITERATIONS_SLOW
+
+    # Measure Traditional For Loop
+    start = time.time()
+    for _ in range(ITERATIONS_SLOW):
+        h.dot_product_loop(list1, list2)
+    avg_loop = (time.time() - start) / ITERATIONS_SLOW
+
+    # Measure NumPy
+    start = time.time()
+    for _ in range(ITERATIONS_FAST):
+        h.dot_product_numpy(array1, array2)
+    avg_numpy = (time.time() - start) / ITERATIONS_FAST
+
+
+    print(f"\nResults for vector size {size}:")
+    print(f"Parallel Dot Time:     {avg_parallel:.8f} seconds")
+    print(f"Traditional Loop Time: {avg_loop:.8f} seconds")
+    print(f"NumPy Dot Time:        {avg_numpy:.8f} seconds")
 
 if __name__ == '__main__':
     print("Which question would you like to run?\n")
-    
     data_in = input("Enter a number from 1 to 4:")
     
     match(data_in):
@@ -156,4 +197,4 @@ if __name__ == '__main__':
             print("Invalid input")
         
     
-    print("End of program")
+    print("\nEnd of program")

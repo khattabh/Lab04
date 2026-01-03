@@ -3,37 +3,108 @@
 
 import numpy as np
 import scipy as sp
-'''
-    Write a numpy program to create a structured array from
-    given student name, height, class and their data types.
-    Then sort the array on height.
-'''
-def student_array():
-    '''
+
+DATA_TYPE = [('name', 'U16'), ('height', 'f4'), ('class', 'i4')]
+#####################################################################
+#   Write a numpy program to create a structured array from         #
+#   given student name, height, class and their data types.         #
+#   Then sort the array on height.                                  #
+#####################################################################
+def student_array(student_data):
+    ''' (list) -> NoneType
+    Create a numpy array from the input list of tuples, student_data,
+    given the data types, DATA_TYPE. Print the original array and
+    then sort the array on height and print the sorted array.
 
     '''
-    return 0
+    students = np.array(student_data, dtype=DATA_TYPE)
 
-'''
-    Using both Numpy and Scipy
-    Kindly solve the following equations using Scipy:
+    print("Original Array:")
+    print(students)
+
     
-    ○ x + 2y - 3z + 2w = 30
-    ○ 2x - 5y + 4z + 9w = 4
-    ○ -5x + 40y - z - 20w = -6
-    ○ 5x - 4y - z + 60w = 5
-'''
+    sorted_students = np.sort(students, order='height')
+
+    print("\nSorted Array (by height):")
+    print(sorted_students)
+
+####################################################################
+#    Using both Numpy and Scipy                                    #
+#    Kindly solve the following equations using Scipy:             #
+#                                                                  #
+#    ○ x + 2y - 3z + 2w = 30                                       #
+#    ○ 2x - 5y + 4z + 9w = 4                                       #
+#    ○ -5x + 40y - z - 20w = -6                                    #
+#    ○ 5x - 4y - z + 60w = 5                                       #
+####################################################################
 def solve_equations():
+    ''' (None) -> None
+        Uses sp.linalg.solve to solve a linear system of equations
+        through Gaussian elimination.
+        Vectors for the linear system of equations are required to be
+        created through numpy arrays.
+        Then print the solutions.
     '''
+    
+    my_switch = input("Would you like to execute the \
+        default linear system of equations?(y/n)")
+    
+    if my_switch == 'y' or my_switch == 'Y':
+        coefficients = np.array([
+            [1, 2, -3, 2],
+            [2, -5, 4, 9],
+            [-5, 40, -1, -20],
+            [5, -4, -1, 60]
+        ])
+        
+        constants = np.array([30, 4, -6, 5])
+    
+    if my_switch == 'n' or my_switch == 'N':
+        print("Input required for the linear system of equations")
+        print("Please enter a comma separated list of numbers\
+            representing the coefficients for the variables x,y,z,w,constant")
+        raw_1 = input("Please enter the first equation")
+        raw_2 = input("Please enter the second equation")
+        raw_3 = input("Please enter the third equation")
+        raw_4 = input("Please enter the fourth equation")
+        
+        string_1 = raw_1.replace(" ", "")
+        string_2 = raw_2.replace(" ", "")
+        string_3 = raw_3.replace(" ", "")
+        string_4 = raw_4.replace(" ", "")
+        
+        list_1 = string_1.split(",")
+        list_2 = string_2.split(",")
+        list_3 = string_3.split(",")
+        list_4 = string_4.split(",")
+        
+        coefficients_list = [list(map(float, list_1)),
+                            list(map(float, list_2)),  
+                            list(map(float, list_3)),
+                            list(map(float, list_4))]
+        
+        constants_list = [list_1.pop(), list_2.pop, list_3.pop(), list_4.pop()]
+        coefficients = np.array(coefficients_list)
+        constants = np.array(constants_list)
+        
 
-    '''
-    return 0
+    
+    else:
+        print("Invalid input")
+        exit(-1)
+    
+    solutions = sp.linalg.solve(coefficients, constants)
+    print("Solutions:")
+    print("x ≈ ", solutions.item(0))
+    print("y ≈ ", solutions.item(1))
+    print("z ≈ ", solutions.item(2))
+    print("w ≈ ", solutions.item(3))
 
-'''
-    Implement the numpy vectorized version of the L2 loss function.
-'''
+####################################################################
+#   Implement the numpy vectorized version of the L2 loss function.#
+####################################################################
 def l2(yhat, y):
-    '''
+    ''' (vector, vector) -> float
     Docstring for l2
     
     :param yhat: vector of size m (predicted labels)
@@ -56,3 +127,33 @@ def compare_dot_product_performance():
 
     '''
     return 0
+
+if __name__ == '__main__':
+    print("Which question would you like to run?\n")
+    
+    data_in = input("Enter a number from 1 to 4:")
+    
+    match(data_in):
+        case "1":
+            student_data = [
+                ('James', 48.5, 1),
+                ('Nail', 52.5, 2),
+                ('Paul', 42.1, 2),
+                ('Pit', 40.1, 1)
+            ]
+            student_array(student_data)
+
+        case "2":
+            solve_equations()
+            
+        case "3":
+            l2()
+        
+        case "4":
+            compare_dot_product_performance()
+        
+        case _:
+            print("Invalid input")
+        
+    
+    print("End of program")
